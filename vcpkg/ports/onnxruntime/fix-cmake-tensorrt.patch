@@ -45,3 +45,4 @@ index 7fa5ba5..a3e6b55 100644
 +  find_path(TENSORRT_INCLUDE_DIR NvInfer.h REQUIRED
      HINTS ${TENSORRT_ROOT}
      PATH_SUFFIXES include)
+
