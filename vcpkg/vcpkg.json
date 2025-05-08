@@ -1,9 +1,10 @@
 {
   "dependencies": [
-    { "name": "opencv4", "features": [ "contrib", "world" ] },
+    { "name": "opencv4", "features": [ "world" ] },
     { "name": "onnxruntime-gpu", "platform": "windows" }
   ],
   "vcpkg-configuration": {
+    "overlay-ports": ["./ports"],
     "overlay-triplets": ["./triplets"]
   }
 }
