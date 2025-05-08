@@ -25,6 +25,14 @@ else()
     set(USE_PROTOBUF_SHARED OFF)
 endif()
 
+vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
+    FEATURES
+        test    ONNX_BUILD_TESTS
+        protobuf-lite   ONNX_USE_LITE_PROTO
+    INVERTED_FEATURES
+        static-registration ONNX_DISABLE_STATIC_REGISTRATION
+)
+
 vcpkg_find_acquire_program(PYTHON3)
 
 vcpkg_cmake_configure(
@@ -36,12 +44,12 @@ vcpkg_cmake_configure(
         "-DProtobuf_PROTOC_EXECUTABLE:FILEPATH=${PROTOC}"
         -DONNX_ML=ON
         -DONNX_USE_PROTOBUF_SHARED_LIBS=${USE_PROTOBUF_SHARED}
-        -DONNX_USE_LITE_PROTO=OFF
         -DONNX_USE_MSVC_STATIC_RUNTIME=${USE_STATIC_RUNTIME}
         -DONNX_BUILD_TESTS=OFF
         -DONNX_BUILD_BENCHMARKS=OFF
     MAYBE_UNUSED_VARIABLES
         ONNX_USE_MSVC_STATIC_RUNTIME
+        ONNX_BUILD_BENCHMARKS
 )
 vcpkg_cmake_install()
 vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/ONNX PACKAGE_NAME ONNX)
