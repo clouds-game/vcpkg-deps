@@ -9,6 +9,7 @@ endif()
 
 set(ORT_GIT_COMMIT "e0b66cad282043d4377cea5269083f17771b6dfc")
 set(ORT_GIT_BRANCH "v${VERSION}")
+set(ORT_API_VERSION "1.21")
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
@@ -20,6 +21,7 @@ vcpkg_from_github(
         fix-cmake.patch
         fix-cmake-cuda.patch
         fix-cmake-tensorrt.patch
+        add-soversion.patch
 )
 
 find_program(PROTOC NAMES protoc PATHS "${CURRENT_HOST_INSTALLED_DIR}/tools/protobuf" REQUIRED NO_DEFAULT_PATH NO_CMAKE_PATH)
@@ -110,6 +112,7 @@ vcpkg_cmake_configure(
         # for ORT_BUILD_INFO
         -DORT_GIT_COMMIT=${ORT_GIT_COMMIT}
         -DORT_GIT_BRANCH=${ORT_GIT_BRANCH}
+        -DORT_DLL_SOVERSION=${ORT_API_VERSION}
         # some other customizations ...
         --compile-no-warning-as-error
         "-DCMAKE_CUDA_FLAGS=-Xcudafe --diag_suppress=2803" # too much warnings about attribute
