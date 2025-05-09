@@ -50,12 +50,16 @@ jobs:
       - name: bootstrap-vcpkg-win
         if: runner.os == 'Windows'
         working-directory: ${{ github.workspace }}\vcpkg
-        run: bootstrap-vcpkg.bat -disableMetrics
+        run: |
+          bootstrap-vcpkg.bat -disableMetrics
+          mkdir.exe -p "${{ github.workspace }}\vcpkg_cache"
         shell: cmd
       - name: bootstrap-vcpkg-unix
         if: runner.os != 'Windows'
         working-directory: ${{ github.workspace }}/vcpkg
-        run: ./bootstrap-vcpkg.sh -disableMetrics
+        run: |
+          ./bootstrap-vcpkg.sh -disableMetrics
+          mkdir -p "${{ github.workspace }}/vcpkg_cache"
         shell: bash
       - name: vcpkg-dry-run
         run: |
