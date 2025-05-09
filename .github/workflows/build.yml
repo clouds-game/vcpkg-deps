@@ -66,6 +66,11 @@ jobs:
         run: |
           ./bootstrap-vcpkg.sh -disableMetrics
           mkdir -p "${{ github.workspace }}/vcpkg_cache"
+      - name: Install Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt install libx11-dev libxft-dev libxext-dev  libc-dev  libltdl-dev  autoconf automake autoconf-archive
+        #                  cairo                              gettext.. libxcrypt    vcpkg-make
       - name: vcpkg-dry-run
         run: |
           "${{ github.workspace }}/vcpkg/vcpkg" install --dry-run --triplet ${{ matrix.config.vcpkg_triplet }} | tee vcpkg_dry_run.txt
