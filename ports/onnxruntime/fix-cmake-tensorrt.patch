@@ -9,7 +9,7 @@ index 8642607..d37d112 100644
 +  target_include_directories(cudnn_frontend INTERFACE ${CUDNN_FRONTEND_INCLUDE_DIRS})
 +  return()
 +endif()
-
+ 
  onnxruntime_fetchcontent_declare(
    cudnn_frontend
 diff --git a/cmake/onnxruntime_providers_tensorrt.cmake b/cmake/onnxruntime_providers_tensorrt.cmake
@@ -40,9 +40,9 @@ index 7fa5ba5..a3e6b55 100644
 +    option(onnxruntime_USE_TENSORRT_BUILTIN_PARSER "Use tensorrt oss parser instead of TRT built-in parser" OFF)
      MESSAGE(STATUS "[Note] There is an issue when running \"Debug build\" TRT EP with \"Release build\" TRT built-in parser on Windows. This build will use tensorrt oss parser instead.")
    endif()
-
+ 
 -  find_path(TENSORRT_INCLUDE_DIR NvInfer.h
 +  find_path(TENSORRT_INCLUDE_DIR NvInfer.h REQUIRED
      HINTS ${TENSORRT_ROOT}
      PATH_SUFFIXES include)
-
+ 
