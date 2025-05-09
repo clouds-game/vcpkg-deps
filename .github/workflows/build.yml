@@ -20,15 +20,22 @@ jobs:
       matrix:
         config:
         - os: ubuntu-latest
+          shell: bash
           vcpkg_triplet: x64-linux-dynamic
         - os: macos-latest
+          shell: bash
           vcpkg_triplet: arm64-osx-mixed
         - os: windows-latest
+          shell: msys2 {0}
           vcpkg_triplet: x64-windows-mixed
     env:
       VCPKG_DISABLE_METRICS: 1
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
       VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+
+    defaults:
+      run:
+        shell: ${{ matrix.config.shell }}
 
     steps:
       - uses: actions/checkout@v4
@@ -51,16 +58,14 @@ jobs:
         if: runner.os == 'Windows'
         working-directory: ${{ github.workspace }}\vcpkg
         run: |
-          bootstrap-vcpkg.bat -disableMetrics
-          mkdir.exe -p "${{ github.workspace }}\vcpkg_cache"
-        shell: cmd
+          ./bootstrap-vcpkg.bat -disableMetrics
+          mkdir -p "${{ github.workspace }}/vcpkg_cache"
       - name: bootstrap-vcpkg-unix
         if: runner.os != 'Windows'
         working-directory: ${{ github.workspace }}/vcpkg
         run: |
           ./bootstrap-vcpkg.sh -disableMetrics
           mkdir -p "${{ github.workspace }}/vcpkg_cache"
-        shell: bash
       - name: vcpkg-dry-run
         run: |
           "${{ github.workspace }}/vcpkg/vcpkg" install --dry-run --triplet ${{ matrix.config.vcpkg_triplet }} | tee vcpkg_dry_run.txt
@@ -76,3 +81,6 @@ jobs:
       - name: Build
         run: |
           "${{ github.workspace }}/vcpkg/vcpkg" install --triplet ${{ matrix.config.vcpkg_triplet }}
+      - name: Partial Cache
+        if: always()
+        run: echo "Partial Cache"
