@@ -27,9 +27,17 @@ jobs:
           vcpkg_triplet: x64-windows-mixed
     env:
       VCPKG_DISABLE_METRICS: 1
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
 
     steps:
       - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        if: runner.os == 'Windows'
+        with:
+          msystem: UCRT64
+          update: true
+          # install: git mingw-w64-ucrt-x86_64-gcc
 
       # https://github.com/johnwason/vcpkg-action/blob/master/action.yml
       - name: checkout-vcpkg
@@ -39,19 +47,28 @@ jobs:
           repository: microsoft/vcpkg
           ref: '${{ steps.determine-checkout-revision.outputs.vcpkg-revision }}'
           fetch-depth: ${{ inputs.fetch-depth }}
-        env:
-          VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
       - name: bootstrap-vcpkg-win
         if: runner.os == 'Windows'
         working-directory: ${{ github.workspace }}\vcpkg
-        run: bootstrap-vcpkg.bat
+        run: bootstrap-vcpkg.bat -disableMetrics
         shell: cmd
-        env:
-          VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
       - name: bootstrap-vcpkg-unix
         if: runner.os != 'Windows'
         working-directory: ${{ github.workspace }}/vcpkg
-        run: ./bootstrap-vcpkg.sh
+        run: ./bootstrap-vcpkg.sh -disableMetrics
         shell: bash
-        env:
-          VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+      - name: vcpkg-dry-run
+        run: |
+          "${{ github.workspace }}/vcpkg/vcpkg" install --dry-run --triplet ${{ matrix.config.vcpkg_triplet }} | tee vcpkg_dry_run.txt
+      # VCPKG_BINARY_SOURCES isn't worked now
+      # https://github.com/microsoft/vcpkg/issues/45073
+      - name: Vcpkg Cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/vcpkg_cache
+          key: cache-build-${{ matrix.triplet }}-${{ hashFiles('CMakeFiles.txt', 'CMakePresets.json', 'vcpkg.json') }}
+          restore-keys: |
+            cache-build-${{ matrix.triplet }}-
+      - name: Build
+        run: |
+          "${{ github.workspace }}/vcpkg/vcpkg" install --triplet ${{ matrix.config.vcpkg_triplet }}
