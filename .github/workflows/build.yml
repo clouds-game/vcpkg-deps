@@ -66,24 +66,26 @@ jobs:
         run: |
           ./bootstrap-vcpkg.sh -disableMetrics
           mkdir -p "${{ github.workspace }}/vcpkg_cache"
-      - name: Install Dependencies
+      - name: Install Dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt install libxi-dev libxtst-dev  libx11-dev libxft-dev libxext-dev  libc-dev  libltdl-dev  autoconf automake autoconf-archive
         #                  at-spi2-core           cairo                              gettext.. libxcrypt    vcpkg-make
       - name: vcpkg-dry-run
+        # first time run will have some init output
         run: |
-          "${{ github.workspace }}/vcpkg/vcpkg" install --dry-run --triplet ${{ matrix.config.vcpkg_triplet }} | tee vcpkg_dry_run.txt
+          "${{ github.workspace }}/vcpkg/vcpkg" install --dry-run --triplet ${{ matrix.config.vcpkg_triplet }}
+          "${{ github.workspace }}/vcpkg/vcpkg" install --dry-run --triplet ${{ matrix.config.vcpkg_triplet }} > vcpkg_dry_run.txt
       # VCPKG_BINARY_SOURCES isn't worked now
       # https://github.com/microsoft/vcpkg/issues/45073
       - name: Vcpkg Cache
         uses: actions/cache@v3
         with:
           path: ${{ github.workspace }}/vcpkg_cache
-          key: cache-build-${{ matrix.triplet }}-${{ hashFiles('CMakeFiles.txt', 'CMakePresets.json', 'vcpkg.json') }}
+          key: cache-build-${{ matrix.config.vcpkg_triplet }}-${{ hashFiles('vcpkg_dry_run.txt', 'vcpkg.json') }}
           restore-keys: |
-            cache-build-${{ matrix.triplet }}-
-      - name: Build
+            cache-build-${{ matrix.config.vcpkg_triplet }}-
+      - name: vcpkg-install
         run: |
           "${{ github.workspace }}/vcpkg/vcpkg" install --triplet ${{ matrix.config.vcpkg_triplet }}
       - uses: actions/upload-artifact@v4
