@@ -69,8 +69,8 @@ jobs:
       - name: Install Dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt install libxi-dev libxtst-dev  libx11-dev libxft-dev libxext-dev  libc-dev  libltdl-dev  autoconf automake autoconf-archive
-        #                  at-spi2-core           cairo                              gettext.. libxcrypt    vcpkg-make
+          sudo apt install libxi-dev libxtst-dev  libx11-dev libxft-dev libxext-dev  libc-dev  libxrandr-dev  libltdl-dev  autoconf automake autoconf-archive
+        #                  at-spi2-core           cairo                              gettext.. gtk            libxcrypt    vcpkg-make
       - name: vcpkg-dry-run
         # first time run will have some init output
         run: |
