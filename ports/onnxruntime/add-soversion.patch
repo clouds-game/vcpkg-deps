@@ -3,7 +3,7 @@
 @@ -256,8 +256,15 @@ target_link_libraries(onnxruntime PRIVATE
      ${onnxruntime_EXTERNAL_LIBRARIES}
  )
-
+ 
 +option(ORT_DLL_SOVERSION "DLL SOVERSION" "")
  if(WIN32)
    target_link_options(onnxruntime PRIVATE ${onnxruntime_DELAYLOAD_FLAGS})

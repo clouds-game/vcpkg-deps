@@ -5,7 +5,7 @@ index 795f019..25765dc 100644
 @@ -232,8 +232,8 @@
        target_link_libraries(${target} PRIVATE CUDA::cuda_driver)
      endif()
-
+ 
 -    include(cutlass)
 -    target_include_directories(${target} PRIVATE ${cutlass_SOURCE_DIR}/include ${cutlass_SOURCE_DIR}/examples ${cutlass_SOURCE_DIR}/tools/util/include)
 +    find_package(NvidiaCutlass REQUIRED)
