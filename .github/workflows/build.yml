@@ -21,7 +21,7 @@ jobs:
         config:
         - os: ubuntu-latest
           shell: bash
-          vcpkg_triplet: x64-linux-dynamic
+          vcpkg_triplet: x64-linux-mixed
         - os: macos-latest
           shell: bash
           vcpkg_triplet: arm64-osx-mixed
@@ -88,11 +88,16 @@ jobs:
       - name: vcpkg-install
         run: |
           "${{ github.workspace }}/vcpkg/vcpkg" install --triplet ${{ matrix.config.vcpkg_triplet }}
+      - name: vcpkg-export
+        run: |
+          cat vcpkg_installed/vcpkg/info/onnxruntime*.list vcpkg_installed/vcpkg/info/opencv4*.list > filelist.txt
+          mkdir vcpkg_exported
+          rsync --files-from filelist.txt vcpkg_installed vcpkg_exported
       - uses: actions/upload-artifact@v4
         id: artifact-upload-step
         with:
           name: prebuilt-${{ matrix.config.vcpkg_triplet }}
-          path: ${{ github.workspace }}/vcpkg_installed/${{ matrix.config.vcpkg_triplet }}
+          path: ${{ github.workspace }}/vcpkg_exported/${{ matrix.config.vcpkg_triplet }}
           if-no-files-found: error
       - name: Output artifact ID
         run:  echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
