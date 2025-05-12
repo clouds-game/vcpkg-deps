@@ -44,7 +44,7 @@ jobs:
         with:
           msystem: UCRT64
           update: true
-          # install: git mingw-w64-ucrt-x86_64-gcc
+          install: rsync #git mingw-w64-ucrt-x86_64-gcc
 
       # https://github.com/johnwason/vcpkg-action/blob/master/action.yml
       - name: checkout-vcpkg
@@ -101,3 +101,8 @@ jobs:
           if-no-files-found: error
       - name: Output artifact ID
         run:  echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prebuilt-alldeps-${{ matrix.config.vcpkg_triplet }}
+          path: ${{ github.workspace }}/vcpkg_installed/${{ matrix.config.vcpkg_triplet }}
+          retention-days: 7
