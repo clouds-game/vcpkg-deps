@@ -69,6 +69,7 @@ jobs:
       - name: Install Dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
           sudo apt install libxi-dev libxtst-dev  libx11-dev libxft-dev libxext-dev  libc-dev  libxrandr-dev  libltdl-dev  autoconf automake autoconf-archive
         #                  at-spi2-core           cairo                              gettext.. gtk            libxcrypt    vcpkg-make
       - name: vcpkg-dry-run
@@ -90,7 +91,7 @@ jobs:
           "${{ github.workspace }}/vcpkg/vcpkg" install --triplet ${{ matrix.config.vcpkg_triplet }}
       - name: vcpkg-export
         run: |
-          cat vcpkg_installed/vcpkg/info/onnxruntime*.list vcpkg_installed/vcpkg/info/opencv4*.list > filelist.txt
+          cat vcpkg_installed/vcpkg/info/onnxruntime*.list vcpkg_installed/vcpkg/info/opencv4*.list | grep -v '/$' | tee filelist.txt
           mkdir vcpkg_exported
           rsync --files-from filelist.txt vcpkg_installed vcpkg_exported
       - uses: actions/upload-artifact@v4
