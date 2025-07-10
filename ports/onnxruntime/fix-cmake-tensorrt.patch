@@ -32,14 +32,9 @@ index 7fa5ba5..a3e6b55 100644
    set(OLD_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
    set(PROTOBUF_LIBRARY ${PROTOBUF_LIB})
    if (WIN32)
-@@ -31,11 +36,11 @@
-   # There is an issue when running "Debug build" TRT EP with "Release build" TRT builtin parser on Windows.
-   # We enforce following workaround for now until the real fix.
-   if (WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Debug")
--    set(onnxruntime_USE_TENSORRT_BUILTIN_PARSER OFF)
-+    option(onnxruntime_USE_TENSORRT_BUILTIN_PARSER "Use tensorrt oss parser instead of TRT built-in parser" OFF)
-     MESSAGE(STATUS "[Note] There is an issue when running \"Debug build\" TRT EP with \"Release build\" TRT built-in parser on Windows. This build will use tensorrt oss parser instead.")
+@@ -28,7 +28,7 @@
    endif()
+   set(CXX_VERSION_DEFINED TRUE)
  
 -  find_path(TENSORRT_INCLUDE_DIR NvInfer.h
 +  find_path(TENSORRT_INCLUDE_DIR NvInfer.h REQUIRED
