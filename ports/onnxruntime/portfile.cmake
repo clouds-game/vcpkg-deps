@@ -7,17 +7,16 @@ if(VCPKG_TARGET_IS_OSX OR VCPKG_TARGET_IS_IOS)
     endif()
 endif()
 
-set(ORT_GIT_COMMIT "e0b66cad282043d4377cea5269083f17771b6dfc")
+set(ORT_GIT_COMMIT "89746dc19a0a1ae59ebf4b16df9acab8f99f3925")
 set(ORT_GIT_BRANCH "v${VERSION}")
-set(ORT_API_VERSION "1.21")
+set(ORT_API_VERSION "1.22")
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO microsoft/onnxruntime
     REF ${ORT_GIT_BRANCH}
-    SHA512 028a7f48f41d2e8a453aae25ebc4cd769db389401937928b7d452fab5f8d7af8cb63eb4150daf79589845528f0e4c3bdfefa27af70d3630398990c9e8b85387b
+    SHA512 6fd9da2c9db62659ff10e011d02109262d9d494cc0594aa0a096146c5df907acced42e76ef409927899c856075dd4ba64a294442f65e7eabf7d4dc7049991b43
     PATCHES
-        fix-sources.patch
         fix-cmake.patch
         fix-cmake-cuda.patch
         fix-cmake-tensorrt.patch
