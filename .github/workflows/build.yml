@@ -115,23 +115,27 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download all artifacts
+      - name: Download artifacts for release (excluding alldeps)
         uses: actions/download-artifact@v4
         with:
-          pattern: prebuilt-*
+          name: prebuilt-x64-linux-mixed
           path: artifacts/
-          merge-multiple: false
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: prebuilt-arm64-osx-mixed
+          path: artifacts/
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: prebuilt-x64-windows-mixed
+          path: artifacts/
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
           for artifact_dir in artifacts/prebuilt-*/; do
             if [ -d "$artifact_dir" ] && [ "$(ls -A "$artifact_dir")" ]; then
               artifact_name=$(basename "$artifact_dir")
-              # Skip alldeps artifacts for release
-              if [[ "$artifact_name" == *"alldeps"* ]]; then
-                echo "Skipping $artifact_name (alldeps not included in releases)"
-                continue
-              fi
               echo "Processing $artifact_name"
               cd "$artifact_dir"
               zip -r "../../release-assets/${artifact_name}.zip" . || {
