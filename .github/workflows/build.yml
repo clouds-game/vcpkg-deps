@@ -125,14 +125,24 @@ jobs:
         run: |
           mkdir -p release-assets
           for artifact_dir in artifacts/prebuilt-*/; do
-            if [ -d "$artifact_dir" ]; then
+            if [ -d "$artifact_dir" ] && [ "$(ls -A "$artifact_dir")" ]; then
               artifact_name=$(basename "$artifact_dir")
+              # Skip alldeps artifacts for release
+              if [[ "$artifact_name" == *"alldeps"* ]]; then
+                echo "Skipping $artifact_name (alldeps not included in releases)"
+                continue
+              fi
+              echo "Processing $artifact_name"
               cd "$artifact_dir"
-              zip -r "../../release-assets/${artifact_name}.zip" .
+              zip -r "../../release-assets/${artifact_name}.zip" . || {
+                echo "Warning: Failed to create zip for $artifact_name"
+                cd - > /dev/null
+                continue
+              }
               cd - > /dev/null
             fi
           done
-          ls -la release-assets/
+          ls -la release-assets/ || echo "No release assets created"
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -140,5 +150,6 @@ jobs:
           name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
