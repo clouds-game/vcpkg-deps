@@ -7,6 +7,7 @@ on:
   # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
     branches: [ "master" ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ "master" ]
 
@@ -52,8 +53,6 @@ jobs:
         with:
           path: ${{ github.workspace }}/vcpkg
           repository: microsoft/vcpkg
-          ref: '${{ steps.determine-checkout-revision.outputs.vcpkg-revision }}'
-          fetch-depth: ${{ inputs.fetch-depth }}
       - name: bootstrap-vcpkg-win
         if: runner.os == 'Windows'
         working-directory: ${{ github.workspace }}\vcpkg
@@ -108,3 +107,38 @@ jobs:
           name: prebuilt-alldeps-${{ matrix.config.vcpkg_triplet }}
           path: ${{ github.workspace }}/vcpkg_installed/${{ matrix.config.vcpkg_triplet }}
           retention-days: 7
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: prebuilt-*
+          path: artifacts/
+          merge-multiple: false
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          for artifact_dir in artifacts/prebuilt-*/; do
+            if [ -d "$artifact_dir" ]; then
+              artifact_name=$(basename "$artifact_dir")
+              cd "$artifact_dir"
+              zip -r "../../release-assets/${artifact_name}.zip" .
+              cd - > /dev/null
+            fi
+          done
+          ls -la release-assets/
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release-assets/*.zip
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
